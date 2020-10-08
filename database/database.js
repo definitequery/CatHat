@@ -1,4 +1,10 @@
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./cathat.db');
+const { Pool } = require('pg');
+const pool = new Pool({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'cathat',
+    password: process.env.DB_PASSWORD,
+    port: 5432
+});
 
-module.exports = db;
+module.exports = pool;
