@@ -12,6 +12,9 @@
         </div>
         <div className="cathat-body">
             <h3>Log In</h3>
+            {{#error}}
+                <p>ERROR: Incorrect username or password</p>
+            {{/error}}
             <form action="/signin" method="POST">
                 <div>
                     <input type="text" name="email" placeholder="Email" />

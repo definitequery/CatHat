@@ -3,15 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CatHat - Home</title>
+    <title>CatHat - Courses</title>
 </head>
 <body>
     <div>
         <div className="cathat-head">
             <h1>Courses</h1>
+            <h1>{{firstName}} {{lastName}}</h1>
+            {{#instructor}}
+                <h3>Instructor</h3>
+            {{/instructor}}
+            {{^instructor}}
+                <h3>Student</h3>
+            {{/instructor}}
         </div>
         <div className="cathat-body">
-            <p>LOREM IPSUM</p>
+            <div>
+                <a href="./signout">Sign Out</a>
+            </div>
         </div>
     </div>
 </body>
