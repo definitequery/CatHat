@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/styles/index.css" />
+    <script src="/scripts/modal.js" defer></script>
+    <title>Cat Hat - <%= page %></title>
+</head>
+<body>
+    <div>
+        <% if (page === 'Sign In') { %>
+            <%- include('./signin'); %>
+        <% } else if (page === 'Home') { %>
+            <%- include('./home'); %>
+        <% } else if (page === 'Sign Up') { %>
+            <%- include('./signup'); %>
+        <% } else if (page === 'Courses') { %>
+            <%- include('./courses'); %>
+        <% } %>
+    </div>
+</div>
+</body>
+</html>

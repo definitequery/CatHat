@@ -1,0 +1,12 @@
+<a href="#">Cat Hat</a>
+<a href="#">Aaron Simpson</a>
+<a href="/signout">Log Out</a>
+<div>
+    <h2>Your Courses - <%= data.school %></h2>
+    <div>
+        <% if (data.role === "Instructor") { %>
+            <button id="create-course-button">Create Course</button>
+        <% } %>
+    </div>
+    <%- include('./create_course'); %>
+</div>
