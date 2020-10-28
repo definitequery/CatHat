@@ -46,9 +46,46 @@ app.get('/u/:user_id', validateSession, (req, res) => res.send(`GETTING USER WIT
 /* Completed Routes */
 app.get('/', (req, res) => res.render('index', {page: 'Home'}));
 app.get('/c/:join_code', validateSession, (req, res) => res.render('course', {join_code: req.params.join_code}));
-app.get('/c', validateSession, (req, res) => res.render('index', {page: 'Courses', data: req.session.user}));
+app.get('/c', validateSession, (req, res) => {
+    const query = `SELECT * FROM "Users" U INNER JOIN "CourseUsers" CU ON CU.user_id = U.user_id
+        INNER JOIN "Courses" C ON C.course_id = CU.course_id WHERE email=$1`;
+    database.query(query, [req.session.user.email], (error, results) => {
+        if (error) throw error;
+        res.render('index', {page: 'Courses', user: req.session.user, data: results.rows});
+    });
+});
 app.post('/c', (req, res) => {
-    console.log(req.body);
+    var query = `INSERT INTO "Courses"(course_name, start_date, subject, course_code, description, password_hash, 
+        password_salt, join_code) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`;
+    const join_code = Math.floor(100000 + Math.random() * 900000);
+    if (req.body.course_password[0]) {
+        if (req.body.course_password[0] !== req.body.course_password[1]) {
+            res.render('index', {page: 'Courses', message: 'Error: Passwords must match!'});
+        }
+        parameters = [req.body.course_name, req.body.start_date, req.body.subject, 
+            req.body.course_code, req.body.course_description, "", "", join_code];
+        database.query(query, parameters, (error, results) => {
+            if (error) throw error;
+            query = `INSERT INTO "CourseUsers"(course_id, user_id)
+                SELECT course_id, user_id 
+                FROM "Courses" C CROSS JOIN "Users" U WHERE C.join_code = $1 AND U.email = $2`;
+            database.query(query, [join_code, req.session.user.email], (error, result) => {
+                if (error) throw error;            
+            });
+        });
+    } else {
+        parameters = [req.body.course_name, req.body.start_date, req.body.subject, 
+            req.body.course_code, req.body.course_description, "", "", join_code];
+        database.query(query, parameters, (error, results) => {
+            if (error) throw error;
+            query = `INSERT INTO "CourseUsers"(course_id, user_id)
+                SELECT course_id, user_id 
+                FROM "Courses" C CROSS JOIN "Users" U WHERE C.join_code = $1 AND U.email = $2`;
+            database.query(query, [join_code, req.session.user.email], (error, result) => {
+                if (error) throw error;            
+            });
+        });
+    }
     res.redirect('/c');
 });
 app.get('/signin', (req, res) => {
@@ -65,7 +102,7 @@ app.post('/signin', (req, res) => {
         bcrypt.compare(req.body.password, results.rows[0].password_hash, (error, result) => {
             if (error) throw error;
             if (result) {
-                const user = {first_name: results.rows[0].first_name, last_name: 
+                const user = {email: results.rows[0].email, first_name: results.rows[0].first_name, last_name: 
                     results.rows[0].last_name, role: results.rows[0].name, school: results.rows[0].school};
                 req.session.user = user;
                 res.redirect('/c');
@@ -99,7 +136,7 @@ app.post('/signup', (req, res) => {
                 });
             });
         });
-        const newUser = {first_name: req.body.first_name, last_name: req.body.last_name,
+        const newUser = {email: req.body.email, first_name: req.body.first_name, last_name: req.body.last_name,
             role: (req.body.role == 1) ? 'Student' : 'Instructor', school: req.body.school};
         req.session.user = newUser;
         res.redirect('/c');
