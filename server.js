@@ -91,8 +91,9 @@ app.post('/c', (req, res) => {
 app.get('/signin', (req, res) => {
     if (req.session.user) {
         res.redirect('/c');
+    } else {
+        res.render('index', {page: 'Sign In', message: req.session.message});
     }
-    res.render('index', {page: 'Sign In', message: ""});
 });
 app.post('/signin', (req, res) => {
     const query = `SELECT * FROM "Users" U INNER JOIN "UserRoles" UR ON UR.user_id = U.user_id 
@@ -107,15 +108,17 @@ app.post('/signin', (req, res) => {
                 req.session.user = user;
                 res.redirect('/c');
             } else {
-                res.render('index', {page: 'Sign In', message: 'Error: Incorrect username or password!'});
+                req.session.message = "Error: Incorrect username or password";
+                res.redirect('/signin');
             }
         });
     });
 });
-app.get('/signup', (req, res) => res.render('index', {page: 'Sign Up', message: ''}));
+app.get('/signup', (req, res) => res.render('index', {page: 'Sign Up', message: req.session.message}));
 app.post('/signup', (req, res) => {
     if (req.body.password[0] !== req.body.password[1]) {
-        res.render('index', {page: 'Sign Up', message: 'Error: Passwords must match!'});
+        req.session.message = "Error: Passwords must match";
+        res.redirect('/signup');
     }
     else {
         var query = `INSERT INTO "Users"(first_name, last_name, email, password_hash, 
