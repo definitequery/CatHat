@@ -1,5 +1,5 @@
-<a href="#">Cat Hat</a>
-<a href="#">Aaron Simpson</a>
+<a href="./">Cat Hat</a>
+<a href="#"><%= user.first_name + " " + user.last_name %></a>
 <a href="/signout">Log Out</a>
 <div>
     <h2>Your Courses - <%= user.school %></h2>
@@ -12,10 +12,11 @@
         <% data.forEach(course => { %>
             <div>
                 <p><%= course.course_code %></p>
-                <h3><%= course.course_code + " " + course.course_name %></h3>
+                <h3><a href="/c/<%= course.join_code %>"><%= course.course_code + " " + course.course_name %></a></h3>
                 <p>Join Code: <%= course.join_code %></p>
             </div>
         <% }); %>
     </div>
     <%- include('./create_course'); %>
+    <%- include('./join_course'); %>
 </div>

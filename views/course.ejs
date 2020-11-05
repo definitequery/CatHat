@@ -1,9 +1,9 @@
-<a href="#">Cat Hat</a>
-<a href="#">Aaron Simpson</a>
+<a href="./">Cat Hat</a>
+<a href="#"><%= user.first_name + " " + user.last_name %></a>
 <a href="/signout">Log Out</a>
 <div>
-    <h2>CIS 101: Introduction to Programming</h2>
-    <h4>Join Code: <%= join_code %></h4>
+    <h2><%= data.course_code + " " + data.course_name %></h2>
+    <h4>Join Code: <%= data.join_code %></h4>
     <div>
     </div>
 </div>

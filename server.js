@@ -1,5 +1,4 @@
 require('dotenv').config();
-const ejs = require('ejs');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const database = require('./database/database');
@@ -37,7 +36,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(appLogger);
 
-/* HTTP GET routes */
 app.get('/create', (req, res) => {
     res.render('index', {page: 'Create'});
 });
@@ -45,7 +43,13 @@ app.get('/u/:user_id', validateSession, (req, res) => res.send(`GETTING USER WIT
 
 /* Completed Routes */
 app.get('/', (req, res) => res.render('index', {page: 'Home'}));
-app.get('/c/:join_code', validateSession, (req, res) => res.render('course', {join_code: req.params.join_code}));
+app.get('/c/:join_code', validateSession, (req, res) => {
+    const query = `SELECT * FROM "Courses" C WHERE C.join_code = $1`;
+    database.query(query, [req.params.join_code], (error, results) => {
+        if (error) throw error;
+        res.render('index', {page:'Course', user: req.session.user, data: results.rows[0]});
+    });
+});
 app.get('/c', validateSession, (req, res) => {
     const query = `SELECT * FROM "Users" U INNER JOIN "CourseUsers" CU ON CU.user_id = U.user_id
         INNER JOIN "Courses" C ON C.course_id = CU.course_id WHERE email=$1`;
@@ -54,6 +58,7 @@ app.get('/c', validateSession, (req, res) => {
         res.render('index', {page: 'Courses', user: req.session.user, data: results.rows});
     });
 });
+app.post('/j')
 app.post('/c', (req, res) => {
     var query = `INSERT INTO "Courses"(course_name, start_date, subject, course_code, description, password_hash, 
         password_salt, join_code) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`;

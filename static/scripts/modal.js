@@ -1,23 +1,38 @@
 // Get the modal
-var modal = document.getElementById("createCourse");
+var createModal = document.getElementById("createCourse");
+var joinModal = document.getElementById("joinCourse");
 
 // Get the button that opens the modal
 var createCourseBtn = document.getElementById("create-course-button");
+var joinCourseBtn = document.getElementById("join-course-button");
 
-var span = document.getElementsByClassName("close")[0];
+var createCancel = document.getElementsByClassName("close")[0];
+var joinCancel = document.getElementsByClassName("close")[1];
 
 // When the user clicks on the button, open the modal
-createCourseBtn.onclick = function() {
-    modal.style.display = "block";
+
+if (createCourseBtn) {
+  createCourseBtn.onclick = function() {
+    createModal.style.display = "block";
+  } 
+  createCancel.onclick = function() {
+    createModal.style.display = "none";
+  }
 }
 
-span.onclick = function() {
-  modal.style.display = "none";
+if (joinCourseBtn) {
+  joinCourseBtn.onclick = function() {
+    joinModal.style.display = 'block';
+  }
+  joinCancel.onclick = function() {
+    joinModal.style.display = "none";
+  }
 }
 
 // When the user clicks anywhere outside of the modal, close it
 window.onClick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
+  if (event.target == createModal) {
+    createModal.style.display = "none";
+    joinModal.style.display = "none";
   }
 }
