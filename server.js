@@ -9,6 +9,8 @@ const session = require('express-session');
 const connectPG = require('connect-pg-simple')(session);
 const uuid = require('uuid');
 const bcrypt = require('bcrypt')
+const fs = require('fs');
+const showdown = require('showdown');
 app = express();
 
 const saltRounds = 10;
@@ -36,18 +38,67 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(appLogger);
 
-app.get('/create', (req, res) => {
-    res.render('index', {page: 'Create'});
-});
-app.get('/u/:user_id', validateSession, (req, res) => res.send(`GETTING USER WITH USER ID ${req.params.user_id}`));
-
 /* Completed Routes */
 app.get('/', (req, res) => res.render('index', {page: 'Home'}));
+app.get('/c/:join_code/a', validateSession, (req, res) => {
+    let query = `SELECT * FROM "Courses" C WHERE C.join_code = $1`;
+    let a_code = 0;
+    database.query(query, [req.params.join_code], (error, results) => {
+        if (error) throw error;
+        const data = results.rows[0];
+        if (req.session.user.role == "Instructor") {
+            a_code = Math.floor(100000 + Math.random() * 900000);
+            query = `INSERT INTO "CourseAttendance" (course_id, attendance_code) 
+            VALUES ($1, $2)
+            ON CONFLICT ON CONSTRAINT course_id
+            DO UPDATE SET 
+                course_id = excluded.course_id, 
+                attendance_code = excluded.attendance_code;`;
+            database.query(query, [data.course_id, a_code], (error, results) => {
+                if (error) throw error;
+            });
+        }
+        res.render('index', {page: 'Course', user: req.session.user, data: data, markdown: false, attendance: [true, a_code],
+            message: req.session.message});
+    });
+});
+app.post('/c/:join_code/a', validateSession, (req, res) => {
+    const query = `INSERT INTO "Attendance" (user_id, course_id, is_present, date)
+        SELECT U.user_id, C.course_id, 1, $4 FROM "Courses" C CROSS JOIN "Users" U
+            INNER JOIN "CourseAttendance" CA ON C.course_id = CA.course_id WHERE C.join_code = $1
+            AND CA.attendance_code = $2 AND U.email = $3`;
+    database.query(query, [req.params.join_code, req.body.attendance_code, req.session.user.email, new Date()], (error, results) => {
+        if (error) throw error;
+        if (results.rowCount === 0) {
+            req.session.message = "Error: Invalid attendance code";
+            res.redirect(`/c/${req.params.join_code}/a`);
+        } else if (results.rowCount === 1) {
+            res.redirect('/c');
+        }
+    });
+});
+app.get('/c/:join_code/m', validateSession, (req, res) => {
+    fs.readFile('./markdown/test.md', 'utf8', (error, data) => {
+        if (error) throw error;
+        var converter = new showdown.Converter();
+        var html = converter.makeHtml(data);
+        fs.writeFile('./views/markdown.ejs', html, (error) => {
+            if (error) throw error;
+            console.log("File saved successfully");
+        });
+    });
+    const query = `SELECT * FROM "Courses" C WHERE C.join_code = $1`;
+    database.query(query, [req.params.join_code], (error, results) => {
+        if (error) throw error;
+        res.render('index', {page:'Course', user: req.session.user, data: results.rows[0], markdown: true,
+            attendance: [false, 0], message: ""});
+    });
+});
 app.get('/c/:join_code', validateSession, (req, res) => {
     const query = `SELECT * FROM "Courses" C WHERE C.join_code = $1`;
     database.query(query, [req.params.join_code], (error, results) => {
         if (error) throw error;
-        res.render('index', {page:'Course', user: req.session.user, data: results.rows[0]});
+        res.render('index', {page:'Course', user: req.session.user, data: results.rows[0], markdown: false,  attendance: [false, 0], message: ""});
     });
 });
 app.get('/c', validateSession, (req, res) => {
@@ -60,15 +111,12 @@ app.get('/c', validateSession, (req, res) => {
 });
 app.post('/j')
 app.post('/c', (req, res) => {
-    var query = `INSERT INTO "Courses"(course_name, start_date, subject, course_code, description, password_hash, 
-        password_salt, join_code) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`;
-    const join_code = Math.floor(100000 + Math.random() * 900000);
-    if (req.body.course_password[0]) {
-        if (req.body.course_password[0] !== req.body.course_password[1]) {
-            res.render('index', {page: 'Courses', message: 'Error: Passwords must match!'});
-        }
+    if (req.session.user.role === 'Instructor') {
+        query = `INSERT INTO "Courses"(course_name, start_date, subject, course_code, description, join_code) 
+        VALUES ($1, $2, $3, $4, $5, $6)`;
+        const join_code = Math.floor(100000 + Math.random() * 900000);
         parameters = [req.body.course_name, req.body.start_date, req.body.subject, 
-            req.body.course_code, req.body.course_description, "", "", join_code];
+            req.body.course_code, req.body.course_description, join_code];
         database.query(query, parameters, (error, results) => {
             if (error) throw error;
             query = `INSERT INTO "CourseUsers"(course_id, user_id)
@@ -79,16 +127,11 @@ app.post('/c', (req, res) => {
             });
         });
     } else {
-        parameters = [req.body.course_name, req.body.start_date, req.body.subject, 
-            req.body.course_code, req.body.course_description, "", "", join_code];
-        database.query(query, parameters, (error, results) => {
-            if (error) throw error;
-            query = `INSERT INTO "CourseUsers"(course_id, user_id)
-                SELECT course_id, user_id 
-                FROM "Courses" C CROSS JOIN "Users" U WHERE C.join_code = $1 AND U.email = $2`;
-            database.query(query, [join_code, req.session.user.email], (error, result) => {
-                if (error) throw error;            
-            });
+        query = `INSERT INTO "CourseUsers"(course_id, user_id)
+        SELECT course_id, user_id 
+        FROM "Courses" C CROSS JOIN "Users" U WHERE C.join_code = $1 AND U.email = $2`;
+        database.query(query, [req.body.join_code, req.session.user.email], (error, result) => {
+            if (error) throw error;            
         });
     }
     res.redirect('/c');

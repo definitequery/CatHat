@@ -5,5 +5,24 @@
     <h2><%= data.course_code + " " + data.course_name %></h2>
     <h4>Join Code: <%= data.join_code %></h4>
     <div>
+        <a href="/c/<%= data.join_code %>/m">Content</a>
+        <a href="/c/<%= data.join_code %>/a">Attendance</a>
+        <% if (markdown) { %>
+            <%- include('./markdown'); %>
+        <% } else if (attendance[0]) { %>
+            <% if (user.role == "Instructor") { %>
+                <h4>Attendance Code</h4>
+                <%= attendance[1] %>
+            <% } else { %>
+                <% if (message) { %>
+                    <p><%= message %></p>
+                <% } %>
+                <h4>Attendance Code</h4>
+                <form action="/c/<%= data.join_code %>/a" method="POST">
+                    <input type="text" name="attendance_code" />
+                    <button type="submit">Submit</button>
+                </form>
+            <% } %>
+        <% } %>
     </div>
 </div>
