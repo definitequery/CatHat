@@ -11,6 +11,7 @@ const uuid = require('uuid');
 const bcrypt = require('bcrypt')
 const fs = require('fs');
 const showdown = require('showdown');
+const fetch = require('node-fetch');
 app = express();
 
 const saltRounds = 10;
@@ -41,12 +42,55 @@ app.use(appLogger);
 /* Completed Routes */
 app.get('/', (req, res) => res.render('index', {page: 'Home'}));
 app.get('/c/:join_code/p', validateSession, (req, res) => {
-    const query = `SELECT * FROM "Courses" C WHERE C.join_code = $1`;
+    let query = `SELECT * FROM "Courses" C WHERE C.join_code = $1`;
     database.query(query, [req.params.join_code], (error, results) => {
         if (error) throw error;
+        const data = results.rows[0];
+        query = `SELECT * `
+        database.query()
         res.render('index', {page: 'Course', user: req.session.user, data: results.rows[0], markdown: false, attendance: [false, 0],
             message: "", poll: true});
     });
+
+});
+app.post('/c/:join_code/p', validateSession, (req, res) => {
+    if (req.session.user.role === 'Instructor') {
+        const query = `INSERT INTO "CourseAttendance" (course_id, attendance_code) 
+            VALUES ($1, $2)
+            ON CONFLICT ON CONSTRAINT course_id
+            DO UPDATE SET 
+                course_id = excluded.course_id, 
+                attendance_code = excluded.attendance_code;`;
+        if (req.body.multiple === 'on') {
+            database.query(query, [req.body.answer[0], req.body.answer[1], req.body.answer[2], req.body.poll_title, 
+                1, req.params.join_code], (error, results) => {
+                if (error) throw error;
+            }) 
+        } else {
+            database.query(query, [req.body.answer[0], req.body.answer[1], req.body.answer[2], req.body.poll_title, 
+                0, req.params.join_code], (error, results) => {
+                if (error) throw error;
+            });
+        };
+    } else if (req.session.user.role === 'Student') {
+        let answer_1 = req.body.answer[0] === 'on' ? 1 : 0;
+        let answer_2 = req.body.answer[1] === 'on' ? 1 : 0;
+        let answer_3 = req.body.answer[2] === 'on' ? 1 : 0;
+        const query = `INSERT INTO "SurveyResults" (survey_title, answer_1, answer_2, answer_3)
+        SELECT S.title, S.answer$1, $2, $3, $4, $5
+        FROM "Survey" S CROSS JOIN "Courses" C WHERE S.course_id = C.course_id`;
+        if (req.body.multiple === 'on') {
+            database.query(query, [], (error, results) => {
+                if (error) throw error;
+            }) 
+        } else {
+            database.query(query, [req.body.answer[0], req.body.answer[1], req.body.answer[2], req.body.poll_title, 
+                0, req.params.join_code], (error, results) => {
+                if (error) throw error;
+            });
+        };
+    }
+    res.redirect(`/c/${req.params.join_code}`);
 });
 app.get('/c/:join_code/a', validateSession, (req, res) => {
     let query = `SELECT * FROM "Courses" C WHERE C.join_code = $1`;
