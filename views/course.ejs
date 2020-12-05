@@ -7,13 +7,14 @@
     <div>
         <a href="/c/<%= data.join_code %>/m">Content</a>
         <a href="/c/<%= data.join_code %>/a">Attendance</a>
+        <a href="/c/<%= data.join_code %>/p">Poll</a>
         <% if (markdown) { %>
             <%- include('./markdown'); %>
         <% } else if (attendance[0]) { %>
             <% if (user.role == "Instructor") { %>
                 <h4>Attendance Code</h4>
                 <%= attendance[1] %>
-            <% } else { %>
+            <% } else if (attendance[0]) { %>
                 <% if (message) { %>
                     <p><%= message %></p>
                 <% } %>
@@ -22,6 +23,10 @@
                     <input type="text" name="attendance_code" />
                     <button type="submit">Submit</button>
                 </form>
+            <% } %>
+        <% } else if (poll) { %>
+            <% if (user.role == "Instructor") { %>
+                <button type="submit">Create Poll</button>
             <% } %>
         <% } %>
     </div>

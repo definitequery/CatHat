@@ -40,6 +40,14 @@ app.use(appLogger);
 
 /* Completed Routes */
 app.get('/', (req, res) => res.render('index', {page: 'Home'}));
+app.get('/c/:join_code/p', validateSession, (req, res) => {
+    const query = `SELECT * FROM "Courses" C WHERE C.join_code = $1`;
+    database.query(query, [req.params.join_code], (error, results) => {
+        if (error) throw error;
+        res.render('index', {page: 'Course', user: req.session.user, data: results.rows[0], markdown: false, attendance: [false, 0],
+            message: "", poll: true});
+    });
+});
 app.get('/c/:join_code/a', validateSession, (req, res) => {
     let query = `SELECT * FROM "Courses" C WHERE C.join_code = $1`;
     let a_code = 0;
@@ -59,7 +67,7 @@ app.get('/c/:join_code/a', validateSession, (req, res) => {
             });
         }
         res.render('index', {page: 'Course', user: req.session.user, data: data, markdown: false, attendance: [true, a_code],
-            message: req.session.message});
+            message: req.session.message, poll: false});
     });
 });
 app.post('/c/:join_code/a', validateSession, (req, res) => {
@@ -91,14 +99,15 @@ app.get('/c/:join_code/m', validateSession, (req, res) => {
     database.query(query, [req.params.join_code], (error, results) => {
         if (error) throw error;
         res.render('index', {page:'Course', user: req.session.user, data: results.rows[0], markdown: true,
-            attendance: [false, 0], message: ""});
+            attendance: [false, 0], message: "", poll: false});
     });
 });
 app.get('/c/:join_code', validateSession, (req, res) => {
     const query = `SELECT * FROM "Courses" C WHERE C.join_code = $1`;
     database.query(query, [req.params.join_code], (error, results) => {
         if (error) throw error;
-        res.render('index', {page:'Course', user: req.session.user, data: results.rows[0], markdown: false,  attendance: [false, 0], message: ""});
+        res.render('index', {page:'Course', user: req.session.user, data: results.rows[0], markdown: false,  attendance: [false, 0], 
+            message: "", poll: false});
     });
 });
 app.get('/c', validateSession, (req, res) => {
