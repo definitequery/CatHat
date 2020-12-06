@@ -26,30 +26,39 @@
             <% } %>
         <% } else if (poll) { %>
             <% if (user.role === "Instructor") { %>
-                <h4>Create Poll</h4>
                 <form action="/c/<%= data.join_code %>/p" method="POST">
+                    <p>What movie should we watch?</p>
                     <ul>
                         <li>
-                            <label for="poll_title">Title:</label>
-                            <input type="text" name="poll_title" required />
+                            <p>A: Sucker Punch <%= poll_results ? poll_results.answer_1 : 0 %></p>
                         </li>
                         <li>
-                            <label for="answer">Question 1:</label>
-                            <input type="text" name="answer" required />
+                            <p>B: The Avengers <%= poll_results ? poll_results.answer_2 : 0 %></p>
                         </li>
                         <li>
-                            <label for="answer">Question 2:</label>
-                            <input type="text" name="answer" required />
+                            <p>C: Batman: The Dark Knight <%= poll_results ? poll_results.answer_3 : 0 %><p>
+                        </li>
+                    </ul>
+                </form>
+            <% } else if (user.role === "Student") { %>
+                <form action="/c/<%= data.join_code %>/p" method="POST">
+                    <p>What movie should we watch?</p>
+                    <ul>
+                        <li>
+                            <label for="answer">A: Sucker Punch</label>
+                            <input name="answer" type="radio" value="Sucker Punch" />
                         </li>
                         <li>
-                            <label for="answer">Question 3:</label>
-                            <input type="text" name="answer" required />
+                            <label for="answer">B: The Avengers</label>
+                            <input name="answer" type="radio" value="The Avengers" />
                         </li>
                         <li>
-                            <label for="hidden">Multiple Answers?</label>
-                            <input type="checkbox" name="multiple" />
+                            <label for="answer">C: Batman: The Dark Knight</label>
+                            <input name="answer" type="radio" value="Batman: The Dark Knight" />
                         </li>
-                        <li><button type="submit">Create Poll</button></li>
+                        <li>
+                            <button type="submit">Submit</button>
+                        </li>
                     </ul>
                 </form>
             <% } %>

@@ -46,51 +46,55 @@ app.get('/c/:join_code/p', validateSession, (req, res) => {
     database.query(query, [req.params.join_code], (error, results) => {
         if (error) throw error;
         const data = results.rows[0];
-        query = `SELECT * `
-        database.query()
-        res.render('index', {page: 'Course', user: req.session.user, data: results.rows[0], markdown: false, attendance: [false, 0],
-            message: "", poll: true});
+        if (req.session.user.role === "Instructor") {
+            query = `SELECT * FROM "SurveyResults" WHERE course_id = $1`
+            database.query(query, [data.course_id], (error, results) => {
+                if (error) throw error;
+                res.render('index', {page: 'Course', user: req.session.user, data: data, markdown: false, attendance: [false, 0],
+                    message: req.session.message, poll: true, poll_results: results.rows[0]});
+            });
+        } else if (req.session.user.role === 'Student') {
+            res.render('index', {page: 'Course', user: req.session.user, data: data, markdown: false, attendance: [false, 0],
+                message: req.session.message, poll: true, poll_results: {}});
+        }
     });
-
 });
 app.post('/c/:join_code/p', validateSession, (req, res) => {
-    if (req.session.user.role === 'Instructor') {
-        const query = `INSERT INTO "CourseAttendance" (course_id, attendance_code) 
-            VALUES ($1, $2)
-            ON CONFLICT ON CONSTRAINT course_id
+    let query = `SELECT * FROM "Courses" C WHERE C.join_code = $1`;
+    database.query(query, [req.params.join_code], (error, results) => {
+        if (error) throw error;
+        const data = results.rows[0];
+        query = `INSERT INTO "SurveyResults" (answer_1, answer_2, answer_3, course_id) 
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT ON CONSTRAINT course
             DO UPDATE SET 
-                course_id = excluded.course_id, 
-                attendance_code = excluded.attendance_code;`;
-        if (req.body.multiple === 'on') {
-            database.query(query, [req.body.answer[0], req.body.answer[1], req.body.answer[2], req.body.poll_title, 
-                1, req.params.join_code], (error, results) => {
+                answer_1 = excluded.answer_1 + "SurveyResults".answer_1,
+                answer_2 = excluded.answer_2 + "SurveyResults".answer_2,
+                answer_3 = excluded.answer_3 + "SurveyResults".answer_3;`
+        if (req.body.answer === 'Sucker Punch') {
+            let answer_1 = 1;
+            let answer_2 = 0;
+            let answer_3 = 0;
+            database.query(query, [answer_1, answer_2, answer_3, data.course_id], (error, results) => {
                 if (error) throw error;
-            }) 
-        } else {
-            database.query(query, [req.body.answer[0], req.body.answer[1], req.body.answer[2], req.body.poll_title, 
-                0, req.params.join_code], (error, results) => {
+            }); 
+        } else if (req.body.answer === 'The Avengers') {
+            let answer_1 = 0;
+            let answer_2 = 1;
+            let answer_3 = 0;
+            database.query(query, [answer_1, answer_2, answer_3, data.course_id], (error, results) => {
                 if (error) throw error;
-            });
-        };
-    } else if (req.session.user.role === 'Student') {
-        let answer_1 = req.body.answer[0] === 'on' ? 1 : 0;
-        let answer_2 = req.body.answer[1] === 'on' ? 1 : 0;
-        let answer_3 = req.body.answer[2] === 'on' ? 1 : 0;
-        const query = `INSERT INTO "SurveyResults" (survey_title, answer_1, answer_2, answer_3)
-        SELECT S.title, S.answer$1, $2, $3, $4, $5
-        FROM "Survey" S CROSS JOIN "Courses" C WHERE S.course_id = C.course_id`;
-        if (req.body.multiple === 'on') {
-            database.query(query, [], (error, results) => {
-                if (error) throw error;
-            }) 
-        } else {
-            database.query(query, [req.body.answer[0], req.body.answer[1], req.body.answer[2], req.body.poll_title, 
-                0, req.params.join_code], (error, results) => {
+            }); 
+        } else if (req.body.answer === 'Batman: The Dark Knight') {
+            let answer_1 = 0;
+            let answer_2 = 0;
+            let answer_3 = 1;
+            database.query(query, [answer_1, answer_2, answer_3, data.course_id], (error, results) => {
                 if (error) throw error;
             });
-        };
-    }
-    res.redirect(`/c/${req.params.join_code}`);
+        }
+    });
+    res.redirect(`/c/${req.params.join_code}/`);
 });
 app.get('/c/:join_code/a', validateSession, (req, res) => {
     let query = `SELECT * FROM "Courses" C WHERE C.join_code = $1`;
