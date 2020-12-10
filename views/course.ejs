@@ -1,66 +1,78 @@
-<a href="./">Cat Hat</a>
-<a href="#"><%= user.first_name + " " + user.last_name %></a>
-<a href="/signout">Log Out</a>
-<div>
+<div class="cathat-head">
+    <ul class="nav-bar">
+        <li><h1>CAT HAT</h1></li>
+        <li><a class="home-link" href="#"><%= user.first_name + " " + user.last_name %></a></li>
+        <li><a class="home-link" href="/signout">Log Out</a></li>
+    </ul>
+</div>
+<div class="cathat-body body-section a">
     <h2><%= data.course_code + " " + data.course_name %></h2>
     <h4>Join Code: <%= data.join_code %></h4>
     <div>
-        <a href="/c/<%= data.join_code %>/m">Content</a>
-        <a href="/c/<%= data.join_code %>/a">Attendance</a>
-        <a href="/c/<%= data.join_code %>/p">Poll</a>
+        <a class="page-link" href="/c/<%= data.join_code %>/m">Content</a>
+        <a class="page-link" href="/c/<%= data.join_code %>/a">Attendance</a>
+        <a class="page-link" href="/c/<%= data.join_code %>/p">Poll</a>
         <% if (markdown) { %>
-            <%- include('./markdown'); %>
+            <div class="course">
+                <%- include('./markdown'); %>
+            </div>
         <% } else if (attendance[0]) { %>
-            <% if (user.role == "Instructor") { %>
-                <h4>Attendance Code</h4>
-                <%= attendance[1] %>
-            <% } else if (attendance[0]) { %>
-                <% if (message) { %>
-                    <p><%= message %></p>
+            <div class="course">
+                <% if (user.role == "Instructor") { %>
+                    <h4>Attendance Code</h4>
+                    <%= attendance[1] %>
+                <% } else if (attendance[0]) { %>
+                    <% if (message) { %>
+                        <p><%= message %></p>
+                    <% } %>
+                    <h4>Attendance Code</h4>
+                    <form action="/c/<%= data.join_code %>/a" method="POST">
+                        <input type="text" name="attendance_code" />
+                        <button class="submit-button" type="submit">Submit</button>
+                    </form>
                 <% } %>
-                <h4>Attendance Code</h4>
-                <form action="/c/<%= data.join_code %>/a" method="POST">
-                    <input type="text" name="attendance_code" />
-                    <button type="submit">Submit</button>
-                </form>
-            <% } %>
+            </div>
         <% } else if (poll) { %>
             <% if (user.role === "Instructor") { %>
-                <form action="/c/<%= data.join_code %>/p" method="POST">
-                    <p>What movie should we watch?</p>
-                    <ul>
-                        <li>
-                            <p>A: Sucker Punch <%= poll_results ? poll_results.answer_1 : 0 %></p>
-                        </li>
-                        <li>
-                            <p>B: The Avengers <%= poll_results ? poll_results.answer_2 : 0 %></p>
-                        </li>
-                        <li>
-                            <p>C: Batman: The Dark Knight <%= poll_results ? poll_results.answer_3 : 0 %><p>
-                        </li>
-                    </ul>
-                </form>
+                <div class="course">
+                    <form action="/c/<%= data.join_code %>/p" method="POST">
+                        <p>What movie should we watch?</p>
+                        <ul>
+                            <li>
+                                <p>A: Sucker Punch <%= poll_results ? poll_results.answer_1 : 0 %></p>
+                            </li>
+                            <li>
+                                <p>B: The Avengers <%= poll_results ? poll_results.answer_2 : 0 %></p>
+                            </li>
+                            <li>
+                                <p>C: Batman: The Dark Knight <%= poll_results ? poll_results.answer_3 : 0 %><p>
+                            </li>
+                        </ul>
+                    </form>
+                </div>
             <% } else if (user.role === "Student") { %>
-                <form action="/c/<%= data.join_code %>/p" method="POST">
-                    <p>What movie should we watch?</p>
-                    <ul>
-                        <li>
-                            <label for="answer">A: Sucker Punch</label>
-                            <input name="answer" type="radio" value="Sucker Punch" />
-                        </li>
-                        <li>
-                            <label for="answer">B: The Avengers</label>
-                            <input name="answer" type="radio" value="The Avengers" />
-                        </li>
-                        <li>
-                            <label for="answer">C: Batman: The Dark Knight</label>
-                            <input name="answer" type="radio" value="Batman: The Dark Knight" />
-                        </li>
-                        <li>
-                            <button type="submit">Submit</button>
-                        </li>
-                    </ul>
-                </form>
+                <div class="course">
+                    <form action="/c/<%= data.join_code %>/p" method="POST">
+                        <p>What movie should we watch?</p>
+                        <ul>
+                            <li>
+                                <label for="answer">A: Sucker Punch</label>
+                                <input name="answer" type="radio" value="Sucker Punch" />
+                            </li>
+                            <li>
+                                <label for="answer">B: The Avengers</label>
+                                <input name="answer" type="radio" value="The Avengers" />
+                            </li>
+                            <li>
+                                <label for="answer">C: Batman: The Dark Knight</label>
+                                <input name="answer" type="radio" value="Batman: The Dark Knight" />
+                            </li>
+                            <li>
+                                <button class="submit-button" type="submit">Submit</button>
+                            </li>
+                        </ul>
+                    </form>
+                </div>
             <% } %>
         <% } %>
     </div>

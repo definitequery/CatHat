@@ -1,23 +1,23 @@
 <div id="joinCourse", class="modal">
     <div class="modal-content">
-        <span class="close">Cancel</span>
-        <div class="modal-header">
-            <h2>Join a Course</h2>
-        </div>
-        <div class="modal-body">
+        <div id="join" class="cathat-body modal-body">
+            <div>
+                <h2>Join a Course</h2>
+            </div>
             <form action="/c" method="POST">
                 <ul>
                     <li>
-                        <label for="join_code">Join Code:</label>
-                        <input type="text" name="join_code" id="join_code" required />
+                        <label class="label" for="join_code">Join Code:</label>
+                        <input class="input-box" type="text" name="join_code" id="join_code" required />
                     </li>
                     <li>
                         <div>
-                            <button type="submit">Join Course</button>
+                            <button class="submit-button" type="submit">Join Course</button>
                         </div>
                     </li>
                 </ul>
             </form>
+            <span class="close">Cancel</span>
         </div>
     </div>
 </div>

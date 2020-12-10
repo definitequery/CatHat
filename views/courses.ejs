@@ -1,18 +1,22 @@
-<a href="./">Cat Hat</a>
-<a href="#"><%= user.first_name + " " + user.last_name %></a>
-<a href="/signout">Log Out</a>
-<div>
+<div class="cathat-head">
+    <ul class="nav-bar">
+        <li><h1>CAT HAT</h1></li>
+        <li><a class="home-link" href="#"><%= user.first_name + " " + user.last_name %></a></li>
+        <li><a class="home-link" href="/signout">Log Out</a></li>
+    </ul>
+</div>
+<div class="cathat-body body-section a">
     <h2>Your Courses - <%= user.school %></h2>
     <div>
         <% if (user.role === "Instructor") { %>
-            <button id="create-course-button">Create Course</button>
+            <button class="submit-button" id="create-course-button">Create Course</button>
         <% } else { %>
-            <button id="join-course-button">Join Course</button>
+            <button class="submit-button" id="join-course-button">Join Course</button>
         <% } %>
         <% data.forEach(course => { %>
-            <div>
+            <div class="course">
                 <p><%= course.course_code %></p>
-                <h3><a href="/c/<%= course.join_code %>"><%= course.course_code + " " + course.course_name %></a></h3>
+                <h3><a class="page-link" href="/c/<%= course.join_code %>"><%= course.course_code + " " + course.course_name %></a></h3>
                 <p>Join Code: <%= course.join_code %></p>
             </div>
         <% }); %>

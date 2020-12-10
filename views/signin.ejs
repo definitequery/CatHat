@@ -1,9 +1,9 @@
-<div className="cathat-head">
-    <div>
-        <h1>CAT HAT</h1>
-    </div>
+<div class="cathat-head">
+    <ul class="nav-bar">
+        <li><h1>CAT HAT</h1></li>
+    </ul>
 </div>
-<div>
+<div class="cathat-body body-section a">
     <h2>Sign In</h2>
     <% if (message) { %>
         <p><%= message %></p>
@@ -11,19 +11,19 @@
     <form action="/signin" method="POST">
         <ul>
             <li>
-                <label for="email">Email: </label>
-                <input type="text" name="email", id="email" placeholder="Enter Email" required />
+                <label class="label" for="email">Email: </label>
+                <input class="input-box" type="text" name="email", id="email" placeholder="Enter Email" required />
             </li>
             <li>
-                <label for="password">Password: </label>
-                <input type="password" name="password", id="password" placeholder="Enter Password" required />
+                <label class="label" for="password">Password: </label>
+                <input class="input-box" type="password" name="password", id="password" placeholder="Enter Password" required />
             </li>
             <li>
                 <div>
-                    <button type="submit">Log In</button>
+                    <button class="submit-button" type="submit">Log In</button>
                 </div>
             </li>
         </ul>
-        <small>Don't have an account? <a href="/signup">Register now.</a></small>
+        <small>Don't have an account? <a class="page-link" href="/signup">Register now.</a></small>
     </form>
 </div>

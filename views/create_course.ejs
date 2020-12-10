@@ -1,39 +1,39 @@
 <div id="createCourse", class="modal">
     <div class="modal-content">
-        <span class="close">Cancel</span>
-        <div class="modal-header">
-            <h2>Create a Course</h2>
-        </div>
-        <div class="modal-body">
+        <div id="create" class="cathat-body modal-body">
+            <div class="modal-header">
+                <h2>Create a Course</h2>
+            </div>
             <form action="/c" method="POST">
                 <ul>
                     <li>
-                        <label for="course_name">Course Name: (Required)</label>
-                        <input type="text" name="course_name" id="course_name" required />
+                        <label class="label" for="course_name">Course Name: (Required)</label>
+                        <input class="input-box" type="text" name="course_name" id="course_name" required />
                     </li>
                     <li>
-                        <label for="start_date">Course Start Date: (Required)</label>
-                        <input type="date" name="start_date" id="start_date" required />
+                        <label class="label" for="start_date">Course Start Date: (Required)</label>
+                        <input class="input-box" type="date" name="start_date" id="start_date" required />
                     </li>
                     <li>
-                        <label for="subject">Subject: (Required)</label>
-                        <input type="text" name="subject" id="subject" required />
+                        <label class="label" for="subject">Subject: (Required)</label>
+                        <input class="input-box" type="text" name="subject" id="subject" required />
                     </li>
                     <li>
-                        <label for="course_code">Course Code: (Required)</label>
-                        <input type="text" name="course_code" id="course_code" required />
+                        <label class="label" for="course_code">Course Code: (Required)</label>
+                        <input class="input-box" type="text" name="course_code" id="course_code" required />
                     </li>
                     <li>
-                        <label for="course_description">Course Description: </label>
-                        <input type="text" name="course_description" id="course_description" />
+                        <label class="label" for="course_description">Course Description: </label>
+                        <input class="input-box" type="text" name="course_description" id="course_description" />
                     </li>
                     <li>
                         <div>
-                            <button type="submit">Create Course</button>
+                            <button class="submit-button" type="submit">Create Course</button>
                         </div>
                     </li>
                 </ul>
             </form>
+            <span class="close">Cancel</span>
         </div>
     </div>
 </div>

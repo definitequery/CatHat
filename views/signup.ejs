@@ -1,9 +1,9 @@
-<div className="cathat-head">
-    <div>
-        <h1>CAT HAT</h1>
-    </div>
+<div class="cathat-head">
+    <ul class="nav-bar">
+        <li><h1>CAT HAT</h1></li>
+    </ul>
 </div>
-<div>
+<div class="cathat-body body-section a">
     <h2>Sign Up</h2>
     <% if (message) { %>
         <p><%= message %></p>
@@ -11,35 +11,35 @@
     <form action="/signup" method="POST">
         <ul>
             <li>
-                <label for="school">School: </label>
+                <label class="label" for="school">School: </label>
                 <input type="text" name="school", id="school" placeholder="Enter School" required />
             </li>
             <li>
-                <label for="role">Student or Instructor: </label>
+                <label class="label" for="role">Student or Instructor: </label>
                 <select name="role" id="role" required>
                     <option value="1">Student</option>
                     <option value="2">Instructor</option>
                 </select>
             </li>
             <li>
-                <label for="email">Email: </label>
-                <input type="text" name="email", id="email" placeholder="Enter Email" required />
+                <label class="label" for="email">Email: </label>
+                <input class="input-box" type="text" name="email", id="email" placeholder="Enter Email" required />
             </li>
             <li>
-                <label for="first_name">First Name: </label>
-                <input type="text" name="first_name", id="first_name" placeholder="Enter First Name" required />
+                <label class="label" for="first_name">First Name: </label>
+                <input class="input-box" type="text" name="first_name", id="first_name" placeholder="Enter First Name" required />
             </li>
             <li>
-                <label for="last_name">Last Name: </label>
-                <input type="text" name="last_name", id="last_name" placeholder="Enter Last Name" required />
+                <label class="label" for="last_name">Last Name: </label>
+                <input class="input-box" type="text" name="last_name", id="last_name" placeholder="Enter Last Name" required />
             </li>
             <li>
-                <label for="password">Password: </label>
-                <input type="password" name="password", id="password" placeholder="Enter Password" required />
+                <label class="label" for="password">Password: </label>
+                <input class="input-box" type="password" name="password", id="password" placeholder="Enter Password" required />
             </li>
             <li>
-                <label for="confirm_password">Confirm Password: </label>
-                <input type="password" name="password", id="confirm_password" placeholder="Confirm Password" required />
+                <label class="label" for="confirm_password">Confirm Password: </label>
+                <input class="input-box" type="password" name="password", id="confirm_password" placeholder="Confirm Password" required />
             </li>
             <li>
                 <input type="checkbox" id="EULA" required />
@@ -47,10 +47,10 @@
             </li>
             <li>
                 <div>
-                    <button type="submit">Create Account</button>
+                    <button class="submit-button" type="submit">Create Account</button>
                 </div>
             </li>
         </ul>
-        <small>Already have an account? <a href="/signin">Sign in here.</a></small>
+        <small>Already have an account? <a class="page-link" href="/signin">Sign in here.</a></small>
     </form>
 </div>
