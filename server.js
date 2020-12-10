@@ -204,19 +204,24 @@ app.post('/signin', (req, res) => {
     const query = `SELECT * FROM "Users" U INNER JOIN "UserRoles" UR ON UR.user_id = U.user_id 
 	    INNER JOIN "Roles" R ON R.role_id = UR.role_id WHERE email=$1`;
     database.query(query, [req.body.email], (error, results) => {
-        if (error) throw error;
-        bcrypt.compare(req.body.password, results.rows[0].password_hash, (error, result) => {
-            if (error) throw error;
-            if (result) {
-                const user = {email: results.rows[0].email, first_name: results.rows[0].first_name, last_name: 
-                    results.rows[0].last_name, role: results.rows[0].name, school: results.rows[0].school};
-                req.session.user = user;
-                res.redirect('/c');
-            } else {
-                req.session.message = "Error: Incorrect username or password";
-                res.redirect('/signin');
-            }
-        });
+        if (error) throw error
+        if (results.rows[0] !== undefined) {
+            bcrypt.compare(req.body.password, results.rows[0].password_hash, (error, result) => {
+                if (error) throw error;
+                if (result) {
+                    const user = {email: results.rows[0].email, first_name: results.rows[0].first_name, last_name: 
+                        results.rows[0].last_name, role: results.rows[0].name, school: results.rows[0].school};
+                    req.session.user = user;
+                    res.redirect('/c');
+                } else {
+                    req.session.message = "Error: Incorrect username or password";
+                    res.redirect('/signin');
+                }
+            });
+        } else {
+            req.session.message = "Error: Incorrect username or password";
+            res.redirect('signin');
+        }
     });
 });
 app.get('/signup', (req, res) => res.render('index', {page: 'Sign Up', message: req.session.message}));
@@ -245,7 +250,7 @@ app.post('/signup', (req, res) => {
             });
         });
         const newUser = {email: req.body.email, first_name: req.body.first_name, last_name: req.body.last_name,
-            role: (req.body.role == 1) ? 'Student' : 'Instructor', school: req.body.school};
+            role: (req.body.role == 2) ? 'Student' : 'Instructor', school: req.body.school};
         req.session.user = newUser;
         res.redirect('/c');
     }
